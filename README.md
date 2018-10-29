@@ -1,10 +1,10 @@
 # Computer Graphics 203.3710, Winter 2018/2019
 ## Students Team data
 
-Name: Hania Oukal
+Name: Hania Oukal 
 Student Number: 204679732
 
-Name: Asala Zreik
+Name: Asala Zreik 
 Student Number: 315795245
 
 ### Lecturer
