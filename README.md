@@ -1,11 +1,11 @@
 # Computer Graphics 203.3710, Winter 2018/2019
 ## Students Team data
 
-Name: 'Your real name'  
-Student Number: 'Your student number'
+Name: Hania Oukal
+Student Number: 204679732
 
-Name: 'Your real name'  
-Student Number: 'Your student number'
+Name: Asala Zreik
+Student Number: 315795245
 
 ### Lecturer
 *Roi Poranne*
