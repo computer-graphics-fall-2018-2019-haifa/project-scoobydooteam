@@ -74,28 +74,63 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 
 void Renderer::Render(const Scene& scene)
 {
-	//#############################################
-	//## You should override this implementation ##
-	//## Here you should render the scene.       ##
-	//#############################################
-
-	// Draw a chess board in the middle of the screen
-	for (int i = 100; i < viewportWidth - 100; i++)
+	const int c = scene.GetModelCount();
+	std::shared_ptr<MeshModel> model;
+	std::vector<glm::vec3> vertices;
+	std::vector<Face> faces;
+	if (c != 0)
 	{
-		for (int j = 100; j < viewportHeight - 100; j++)
+		model = scene.popModel();
+		vertices = model.get()->getVertices();
+		faces = model.get()->getFaces();
+		int i = 0;
+		for (std::vector<Face>::iterator it = faces.begin(); it != faces.end(); it++)
 		{
-			int mod_i = i / 50;
-			int mod_j = j / 50;
+			i++;
+			glm::vec3  p1,p2,p3;
+			p1 = vertices.at(it->GetVertexIndex(0)-1);
+			p2 = vertices.at(it->GetVertexIndex(1)-1);
+			p3 = vertices.at(it->GetVertexIndex(2)-1);
+			double a = p1.x;
+			line(500+p1.x, 500 + p1.y, 500 + p2.x, 500 + p2.y,1);
+			//for (int i = 0; i < 400; i++)
+				//line(500, 500, 500 + 200 * cos(i / 100.0*3.14 / 2), 500 + 200 * sin(i / 100.0*3.14 / 2),1);
+			line(500 + p1.x, 500 + p1.y, 500 + p3.x , 500 + p3.y ,1);
+			line(500 + p2.x , 500 + p2.y, 500 + p3.x, 500 + p3.y ,1);
+			//printf("loop %d",i);
+		}
+	}
+	printf("lkjkjlkj");
+	
+}
 
-			int odd = (mod_i + mod_j) % 2;
-			if (odd)
-			{
-				putPixel(i, j, glm::vec3(0, 1, 0));
-			}
-			else
-			{
-				putPixel(i, j, glm::vec3(1, 0, 0));
-			}
+void Renderer::line(double x, double y, double x2, double y2, int color) {
+	int w = x2 - x;
+	int h = y2 - y;
+	int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+	if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
+	if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
+	if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
+	int longest = abs(w);
+	int shortest = abs(h);
+	if (!(longest > shortest)) {
+		longest = abs(h);
+		shortest = abs(w);
+		if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
+		dx2 = 0;
+	}
+	int numerator = longest >> 1;
+	for (int i = 0; i <= longest; i++) {
+		putPixel(x, y, glm::vec3(255, 255, 0));
+		numerator += shortest;
+		if (!(numerator < longest)) {
+			numerator -= longest;
+			x += dx1;
+			y += dy1;
+		}
+		else {
+			x += dx2;
+			y += dy2;
 		}
 	}
 }

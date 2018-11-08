@@ -36,6 +36,7 @@ public:
 	void SwapBuffers();
 	void ClearColorBuffer(const glm::vec3& color);
 	void SetViewport(int viewportWidth, int viewportHeight, int viewportX = 0, int viewportY = 0);
+	void line(double x0, double y0, double x1, double y1, int color);
 
 	// Add more methods/functionality as needed...
 };

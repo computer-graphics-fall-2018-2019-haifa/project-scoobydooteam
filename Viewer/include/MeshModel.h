@@ -22,6 +22,7 @@ private:
 public:
 	MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName = "");
 	virtual ~MeshModel();
+	MeshModel(MeshModel& model);
 
 	void SetWorldTransformation(const glm::mat4x4& worldTransform);
 	const glm::mat4x4& GetWorldTransformation() const;
@@ -30,6 +31,9 @@ public:
 	void SetColor(const glm::vec4& color);
 
 	const std::string& GetModelName();
+	const std::vector<glm::vec3>& getVertices();
+	const std::vector<glm::vec3>& MeshModel::getNormals();
+	const std::vector<Face>& MeshModel::getFaces();
 
 	// Add more methods/functionality as needed...
 };

@@ -87,6 +87,20 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					}
 
 				}
+				if (ImGui::MenuItem("Load Camera..."))
+				{
+					nfdchar_t *outPath = NULL;
+					nfdresult_t result = NFD_OpenDialog("obj;png,jpg", NULL, &outPath);
+					if (result == NFD_OKAY) {
+						scene.AddCamera(std::make_shared<MeshModel>(Utils::LoadMeshModel(outPath)));
+						free(outPath);
+					}
+					else if (result == NFD_CANCEL) {
+					}
+					else {
+					}
+
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMainMenuBar();

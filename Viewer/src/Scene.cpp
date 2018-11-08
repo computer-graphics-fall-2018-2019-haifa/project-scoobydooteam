@@ -14,6 +14,13 @@ void Scene::AddModel(const std::shared_ptr<MeshModel>& model)
 	models.push_back(model);
 }
 
+std::shared_ptr<MeshModel> Scene::popModel() const
+{
+	if(!models.empty())
+		return models.front();
+	return NULL;
+}
+
 const int Scene::GetModelCount() const
 {
 	return models.size();

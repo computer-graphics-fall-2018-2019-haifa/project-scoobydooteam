@@ -10,12 +10,24 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	modelName(modelName),
 	worldTransform(glm::mat4x4(1))
 {
+	this->faces = faces;
+	this->vertices = vertices;
+	this->normals = normals;
+}
 
+MeshModel::MeshModel(MeshModel& model)
+{
+	this->faces = model.getFaces();
+	this->vertices = model.getVertices();
+	this->normals = model.getNormals();
+	this->modelName = modelName;
 }
 
 MeshModel::~MeshModel()
 {
-
+	/*this->faces.clear();
+	this->vertices.clear();
+	this->normals.clear();*/
 }
 
 void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
@@ -41,4 +53,19 @@ const glm::vec4& MeshModel::GetColor() const
 const std::string& MeshModel::GetModelName()
 {
 	return modelName;
+}
+
+const std::vector<glm::vec3>& MeshModel::getVertices() 
+{
+	return vertices;
+}
+
+const std::vector<glm::vec3>& MeshModel::getNormals()
+{
+	return normals;
+}
+
+const std::vector<Face>& MeshModel::getFaces()
+{
+	return faces;
 }
