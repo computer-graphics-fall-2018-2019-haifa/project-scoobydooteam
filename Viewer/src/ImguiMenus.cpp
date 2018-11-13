@@ -15,6 +15,7 @@
 
 bool showDemoWindow = false;
 bool showAnotherWindow = false;
+bool showCameraParam = false;
 
 glm::vec4 clearColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
 
@@ -25,6 +26,7 @@ const glm::vec4& GetClearColor()
 
 void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 {
+	double eye=-1.0,at=-1.0,up=-1.0;
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (showDemoWindow)
 	{
@@ -35,6 +37,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 		static float f = 0.0f;
 		static int counter = 0;
+
+		
 
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
@@ -65,6 +69,18 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		}
 		ImGui::End();
 	}
+	if (showCameraParam) {
+		ImGui::Begin("Camera Parameters", &showCameraParam);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+		ImGui::Text("please fill in the parameters");
+		ImGui::InputDouble("Eye", &eye, (0, 0));
+		ImGui::InputDouble("At", &at, (0, 0));
+		ImGui::InputDouble("Up", &up, (0, 0));
+		if (ImGui::Button("Close Me"))
+		{
+			showCameraParam = false;
+		}
+		ImGui::End();
+	}
 
 	// 4. Demonstrate creating a fullscreen menu bar and populating it.
 	{
@@ -78,7 +94,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					nfdchar_t *outPath = NULL;
 					nfdresult_t result = NFD_OpenDialog("obj;png,jpg", NULL, &outPath);
 					if (result == NFD_OKAY) {
-						scene.AddModel(std::make_shared<MeshModel>(Utils::LoadMeshModel(outPath)));
+						MeshModel m = Utils::LoadMeshModel(outPath);
+						//m.Translation(1,1,1);
+						scene.AddModel(std::make_shared<MeshModel>(m));
 						free(outPath);
 					}
 					else if (result == NFD_CANCEL) {
@@ -87,19 +105,22 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					}
 
 				}
-				if (ImGui::MenuItem("Load Camera..."))
+				if (ImGui::MenuItem("Load Camera...","CTRL+C"))
 				{
 					nfdchar_t *outPath = NULL;
 					nfdresult_t result = NFD_OpenDialog("obj;png,jpg", NULL, &outPath);
 					if (result == NFD_OKAY) {
-						scene.AddCamera(std::make_shared<MeshModel>(Utils::LoadMeshModel(outPath)));
+						MeshModel m = Utils::LoadMeshModel(outPath);
+						//Camera& c = Camera(m.getFaces(),m.getVertices(),m.getNormals(),m.GetModelName(),eye,at,up);
+						showCameraParam = 1;
+						if(eye!=-1 && at!=-1 && up!=-1)
+							//scene.AddCamera(c);
 						free(outPath);
 					}
 					else if (result == NFD_CANCEL) {
 					}
 					else {
 					}
-
 				}
 				ImGui::EndMenu();
 			}

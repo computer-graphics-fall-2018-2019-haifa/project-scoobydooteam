@@ -36,6 +36,9 @@ public:
 	const int GetActiveModelIndex() const;
 
 	std::shared_ptr<MeshModel> popModel() const;
+	std::vector<std::shared_ptr<MeshModel>> getModels() const;
+
+	std::vector<Camera> GetCameras() const;
 
 	
 	// Add more methods as needed...

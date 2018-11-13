@@ -75,53 +75,93 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 void Renderer::Render(const Scene& scene)
 {
 	const int c = scene.GetModelCount();
-	std::shared_ptr<MeshModel> model;
+	glm::vec2 x0(640, 360);
+	std::vector<std::shared_ptr<MeshModel>> models = scene.getModels();
+	std::vector<Camera> cameras = scene.GetCameras();
 	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
 	std::vector<Face> faces;
-	if (c != 0)
+	/*for (int i=640;i<660;i++)
+		for(int j=360;j<380;j++)
+			putPixel(i, j, glm::vec3(255, 0, 0));*/
+			
+	for (std::vector<std::shared_ptr<MeshModel>>::iterator itr = models.begin(); itr != models.end(); itr++)
 	{
-		model = scene.popModel();
-		vertices = model.get()->getVertices();
-		faces = model.get()->getFaces();
+		glm::vec3 normalL(10.0,10.0,10.0);
 		int i = 0;
+		vertices = (*itr)->getVertices();
+		faces = (*itr)->getFaces();
+		normals = (*itr)->getNormals();
 		for (std::vector<Face>::iterator it = faces.begin(); it != faces.end(); it++)
 		{
 			i++;
 			glm::vec3  p1,p2,p3;
+			glm::vec3  n1, n2, n3;
 			p1 = vertices.at(it->GetVertexIndex(0)-1);
 			p2 = vertices.at(it->GetVertexIndex(1)-1);
 			p3 = vertices.at(it->GetVertexIndex(2)-1);
+			
+			float length = 10;
+			n1 = length * normals.at(it->GetNormalIndex(0) - 1);
+			n2 = normalL * normals.at(it->GetNormalIndex(1) - 1);
+			n3 = normalL * normals.at(it->GetNormalIndex(2) - 1);
+
 			double a = p1.x;
-			line(500+p1.x, 500 + p1.y, 500 + p2.x, 500 + p2.y,1);
+			line(x0.x+p1.x, x0.y + p1.y, x0.x + p2.x, x0.y + p2.y, glm::vec3(255, 255, 0));
+			line(x0.x + p1.x, x0.y + p1.y, x0.x + p3.x , x0.y + p3.y , glm::vec3(255, 255, 0));
+			line(x0.x + p2.x , x0.y + p2.y, x0.x + p3.x, x0.y + p3.y , glm::vec3(255, 255, 0));
+
+			line(p1.x, p1.y, p1.x + n1.x, p1.y + n1.y, glm::vec3(0, 255, 0));
+			line(x0.x + p2.x, x0.y + p2.y, x0.x + n2.x, x0.y + n2.y, glm::vec3(0, 255, 0));
+			line(x0.x + p3.x, x0.y + p3.y, x0.x + n3.x, x0.y + n3.y, glm::vec3(0, 255, 0));
+
 			//for (int i = 0; i < 400; i++)
 				//line(500, 500, 500 + 200 * cos(i / 100.0*3.14 / 2), 500 + 200 * sin(i / 100.0*3.14 / 2),1);
-			line(500 + p1.x, 500 + p1.y, 500 + p3.x , 500 + p3.y ,1);
-			line(500 + p2.x , 500 + p2.y, 500 + p3.x, 500 + p3.y ,1);
+		}
+	}
+
+	for (std::vector<Camera>::iterator itr = cameras.begin(); itr != cameras.end(); itr++)
+	{
+		vertices = itr->getVertices();
+		faces = itr->getFaces();
+		int i = 0;
+		for (std::vector<Face>::iterator it = faces.begin(); it != faces.end(); it++)
+		{
+			i++;
+			glm::vec3  p1, p2, p3;
+			p1 = vertices.at(it->GetVertexIndex(0) - 1);
+			p2 = vertices.at(it->GetVertexIndex(1) - 1);
+			p3 = vertices.at(it->GetVertexIndex(2) - 1);
+			double a = p1.x;
+			line(500 + p1.x, 500 + p1.y, 500 + p2.x, 500 + p2.y, glm::vec3(255, 0, 0));
+			//for (int i = 0; i < 400; i++)
+				//line(500, 500, 500 + 200 * cos(i / 100.0*3.14 / 2), 500 + 200 * sin(i / 100.0*3.14 / 2),1);
+			line(500 + p1.x, 500 + p1.y, 500 + p3.x, 500 + p3.y, glm::vec3(255, 0, 0));
+			line(500 + p2.x, 500 + p2.y, 500 + p3.x, 500 + p3.y, glm::vec3(255, 0, 0));
 			//printf("loop %d",i);
 		}
 	}
-	printf("lkjkjlkj");
 	
 }
 
-void Renderer::line(double x, double y, double x2, double y2, int color) {
-	int w = x2 - x;
-	int h = y2 - y;
-	int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+void Renderer::line(double x, double y, double x2, double y2, glm::vec3 color) {
+	double w = x2 - x;
+	double h = y2 - y;
+	double dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
 	if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
 	if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
 	if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
-	int longest = abs(w);
-	int shortest = abs(h);
+	int longest = abs((int)w);
+	int shortest = abs((int)h);
 	if (!(longest > shortest)) {
-		longest = abs(h);
-		shortest = abs(w);
+		longest = abs((int)h);
+		shortest = abs((int)w);
 		if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
 		dx2 = 0;
 	}
 	int numerator = longest >> 1;
 	for (int i = 0; i <= longest; i++) {
-		putPixel(x, y, glm::vec3(255, 255, 0));
+		putPixel((int)x, (int)y, color);
 		numerator += shortest;
 		if (!(numerator < longest)) {
 			numerator -= longest;

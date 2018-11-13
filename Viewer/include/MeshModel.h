@@ -11,7 +11,7 @@
  */
 class MeshModel
 {
-private:
+protected:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
@@ -20,6 +20,7 @@ private:
 	std::string modelName;
 
 public:
+	MeshModel();
 	MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3>& vertices, const std::vector<glm::vec3>& normals, const std::string& modelName = "");
 	virtual ~MeshModel();
 	MeshModel(MeshModel& model);
@@ -32,8 +33,11 @@ public:
 
 	const std::string& GetModelName();
 	const std::vector<glm::vec3>& getVertices();
-	const std::vector<glm::vec3>& MeshModel::getNormals();
-	const std::vector<Face>& MeshModel::getFaces();
+	const std::vector<glm::vec3>& getNormals();
+	void setVertices(std::vector<glm::vec3> newVers);
+	const std::vector<Face>& getFaces();
+	void Scaling(double sx, double sy, double sz);
+	void Rotation(double deg, int axis);
+	void Translation(double tx, double ty, double tz);
 
-	// Add more methods/functionality as needed...
 };
