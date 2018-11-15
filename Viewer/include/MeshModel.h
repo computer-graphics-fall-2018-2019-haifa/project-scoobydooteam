@@ -15,9 +15,15 @@ protected:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
-	glm::mat4x4 worldTransform;
+	glm::mat4x4 worldTransform= glm::mat4(1.0);
 	glm::vec4 color;
 	std::string modelName;
+	glm::mat4x4 rotationVec=glm::mat4(1.0);
+	glm::mat4x4 translationVec= glm::mat4(1.0);
+	glm::mat4x4 scalingVec= glm::mat4(1.0);
+	glm::vec3 center;
+
+
 
 public:
 	MeshModel();
@@ -25,7 +31,7 @@ public:
 	virtual ~MeshModel();
 	MeshModel(MeshModel& model);
 
-	void SetWorldTransformation(const glm::mat4x4& worldTransform);
+	void SetWorldTransformation(const glm::mat4x4& t);
 	const glm::mat4x4& GetWorldTransformation() const;
 
 	const glm::vec4& GetColor() const;
@@ -34,10 +40,19 @@ public:
 	const std::string& GetModelName();
 	const std::vector<glm::vec3>& getVertices();
 	const std::vector<glm::vec3>& getNormals();
-	void setVertices(std::vector<glm::vec3> newVers);
 	const std::vector<Face>& getFaces();
-	void Scaling(double sx, double sy, double sz);
-	void Rotation(double deg, int axis);
-	void Translation(double tx, double ty, double tz);
+
+	void setVertices(std::vector<glm::vec3> newVers);
+
+	void setRotation(glm::mat4x4 m);
+	void setTranslation(glm::mat4x4 m);
+	void setScaling(glm::mat4x4 m);
+
+	glm::mat4x4 getRotation();
+	glm::mat4x4 getTranslation();
+	glm::mat4x4 getScaling();
+
+	glm::vec3 calcCenter();
+	glm::vec3 getCenter();
 
 };

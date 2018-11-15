@@ -18,6 +18,7 @@ MeshModel::MeshModel(const std::vector<Face>& faces, const std::vector<glm::vec3
 	this->faces = faces;
 	this->vertices = vertices;
 	this->normals = normals;
+	this->center=calcCenter();	
 }
 
 MeshModel::MeshModel(MeshModel& model)
@@ -25,7 +26,8 @@ MeshModel::MeshModel(MeshModel& model)
 	this->faces = model.getFaces();
 	this->vertices = model.getVertices();
 	this->normals = model.getNormals();
-	this->modelName = modelName;
+	this->modelName = model.GetModelName();
+	this->center = model.getCenter();
 }
 
 MeshModel::~MeshModel()
@@ -35,9 +37,25 @@ MeshModel::~MeshModel()
 	this->normals.clear();*/
 }
 
-void MeshModel::SetWorldTransformation(const glm::mat4x4& worldTransform)
+glm::vec3 MeshModel::calcCenter() {
+	float len = faces.size();
+	float face = 3.0;
+	glm::vec3 c(0, 0, 0);
+	for (std::vector<Face>::iterator it = this->faces.begin(); it != this->faces.end(); it++)
+	{
+		glm::vec3 faceCenter(0.0, 0.0, 0.0);
+		for (int i = 0; i < 3; i++)
+			faceCenter += this->vertices.at(it->GetVertexIndex(i) - 1);
+		faceCenter = faceCenter / face;
+		c += faceCenter;
+	}
+	c = c / len;
+	return c;
+}
+
+void MeshModel::SetWorldTransformation(const glm::mat4x4& t)
 {
-	this->worldTransform = worldTransform;
+	this->worldTransform = t* this->worldTransform;
 }
 
 const glm::mat4x4& MeshModel::GetWorldTransformation() const
@@ -77,92 +95,39 @@ const std::vector<Face>& MeshModel::getFaces()
 
 void MeshModel::setVertices(std::vector<glm::vec3> newVers) {
 	std::vector<glm::vec3> ver = this->getVertices();
-	/*for (std::vector<glm::vec3>::iterator it = ver.begin(); it != ver.end(); it++)
-	{
-		this->vertices.erase(*it);
-	}
+		this->vertices.clear();
+	
 	for (std::vector<glm::vec3>::iterator it = newVers.begin(); it != newVers.end(); it++)
 	{
 		this->vertices.push_back(*it);
-	}*/
-
-
-}
-
-void MeshModel::Scaling(double sx, double sy, double sz) {
-	std::vector<glm::vec3> newVers;
-	glm::mat3x3 mat(sx, 0, 0, 0,sy,0,0,0,sz);
-	std::vector<glm::vec3> ver = this->getVertices();
-	int i = 0;
-	for (std::vector<glm::vec3>::iterator it = ver.begin(); it != ver.end(); it++)
-	{
-		vertices[i++]=mat * (*it);
 	}
 }
 
-void MeshModel::Rotation(double deg, int a) {
-
-	std::vector<glm::vec3> newVers;
-	std::vector<glm::vec3> ver = this->getVertices();
-	int i = 0;
-	glm::mat3x3 mat(0, 0, 0, 0, 0, 0, 0, 0, 0);
-	if (a == 0)
-	{
-		if (deg > 0) {
-			glm::mat3x3 mat1(1, 0, 0, 0, cos(deg), -sin(deg), 0, sin(deg), cos(deg));
-			mat = mat1;
-		}
-		else {
-			glm::mat3x3 mat1(1, 0, 0, 0, cos(deg), sin(deg), 0, -sin(deg), cos(deg));
-			mat = mat1;
-		}
-	}
-	else if (a == 1) {
-		if (deg > 0) {
-			glm::mat3x3 mat2(cos(deg), 0, sin(deg), 0, 1, 0, -sin(deg), 0, cos(deg));
-			mat = mat2;
-		}
-		else {
-			glm::mat3x3 mat2(cos(deg), 0, -sin(deg), 0, 1, 0, sin(deg), 0, cos(deg));
-			mat = mat2;
-		}
-	}
-	else if (a == 2)
-	{
-		if (deg > 0){
-			glm::mat3x3 mat3(cos(deg), -sin(deg), 0, sin(deg), cos(deg), 0, 0, 1, 1);
-			mat = mat3;
-		}
-		else {
-			glm::mat3x3 mat3(cos(deg), sin(deg), 0, -sin(deg), cos(deg), 0, 0, 1, 1);
-			mat = mat3;
-		}
-	}
-	for (std::vector<glm::vec3>::iterator it = ver.begin(); it != ver.end(); it++)
-	{
-		vertices[i++] = mat * (*it);
-	}
+void MeshModel::setRotation(glm::mat4x4 m) {
+	this->worldTransform = m * this->worldTransform;
 }
 
-/*TODO: the mat mul does not work correctly!*/
-void MeshModel::Translation(double tx, double ty, double tz) {
-	//std::vector<glm::vec3> newVers;
-	
-	glm::vec4 m0(1, 0, 0, tx);
-	glm::vec4 m1(0, 1, 0, ty);
-	glm::vec4 m2(0, 0, 1, tz);
-	//glm::mat4x4 mat(&m0,&m1,&m2,(0,0,0,1));
+void MeshModel::setTranslation(glm::mat4x4 m) {
+	this->worldTransform = m * this->worldTransform;
+	this->center.x += m[3][0];
+	this->center.y += m[3][1];
+	this->center.z += m[3][2];
 
+}
+void MeshModel::setScaling(glm::mat4x4 m) {
+	this->worldTransform = m * this->worldTransform;
+}
 
-	//std::vector<glm::vec3> ver = this->getVertices();
-	int i = 0;
-	for (std::vector<glm::vec3>::iterator it = vertices.begin(); it != vertices.end(); it++)
-	{
-		//vertices[i] = mat * (*it);
-		vertices[i].x = vertices[i].x / vertices[i].z;
-		vertices[i].y = vertices[i].y / vertices[i].z;
-		vertices[i].z = 1;
-		
-		i++;
-	}
+glm::mat4x4 MeshModel::getRotation() {
+	return this->rotationVec;
+}
+glm::mat4x4 MeshModel::getTranslation() {
+	return this->translationVec;
+}
+glm::mat4x4 MeshModel::getScaling() {
+	return this->scalingVec;
+}
+
+glm::vec3 MeshModel::getCenter() {
+	return this->center;
 }

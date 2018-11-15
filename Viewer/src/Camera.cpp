@@ -55,13 +55,22 @@ void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const gl
 	glm::vec4 y = glm::vec4(normalize(cross(normalize(eye - at), normalize(cross(up, normalize(eye - at))))),0);
 	glm::vec4 t = glm::vec4(0.0, 0.0,0.0, 1.0);
 	glm::mat4x4 mat(x, y, z, t);
-	this->Translation(-eye.x, -eye.y, -eye.z);
-	//glm::vec4 c();
+	mat = glm::transpose(mat);
 	//this->setViewTransformation(mat*c);
 }
 
 void Camera::SetOrthographicProjection(const float height,const float aspectRatio,const float near,const float far)
 {
+	float top = height;
+	float bottom = -top;
+	float right = top * aspectRatio;
+	float left = -right;
+	glm::vec4 m0(2 / (right - left), 0, 0, -(right + left) / (right - left));
+	glm::vec4 m1(0, 2 / (top - bottom), 0, -(top + bottom) / (top - bottom));
+	glm::vec4 m2(0, 0, -2 / (far - near), -(far + near) / (far - near));
+	glm::vec4 m3(0, 0, 0, 1.0);
+	glm::mat4x4 mat(m0, m1, m2, m3);
+	this->setProjectionTransformation(mat);
 
 }
 
@@ -72,10 +81,13 @@ void Camera::SetPerspectiveProjection(const float fovy,const float aspectRatio,c
 	float right=top*aspectRatio;
 	glm::vec4 m0(near / right, 0, 0, 0);
 	glm::vec4 m1(0, near / top, 0, 0);
-	glm::vec4 m2(0,0,(-far+near) / (far+near), (-2*far*near)/(far-near));
+	glm::vec4 m2(0,0,-(far+near) / (far-near), (-2*far*near)/(far-near));
 	glm::vec4 m3(0,0,-1,0);
 	glm::mat4x4 mat(m0, m1, m2, m3);
-	this->projectionTransformation = mat;
+	this->setProjectionTransformation(mat);
+	this->SetCameraLookAt(glm::vec3(center.x, center.y, center.z), glm::vec3(0, 1, 0), glm::vec3(0, 0, -1));
+	
+	//this->viewTransformation=
 }
 
 void Camera::SetZoom(const float zoom)
@@ -87,8 +99,8 @@ glm::mat4x4 Camera::getViewTransformation() {
 	return this->viewTransformation;
 }
 
-void Camera::setViewTransformation(const glm::mat4x4 mat) {
-	this->viewTransformation = mat;
+void Camera::setViewTransformation(const glm::mat4x4 t) {
+	this->viewTransformation = t*this->viewTransformation;
 }
 
 glm::mat4x4 Camera::getProjectionTransformation() {

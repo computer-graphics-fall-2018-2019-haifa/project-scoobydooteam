@@ -29,7 +29,8 @@ public:
 	~Camera();
 
 	glm::mat4x4 getViewTransformation();
-	void setViewTransformation(const glm::mat4x4 mat);
+	void setViewTransformation(const glm::mat4x4 t);
+
 	glm::mat4x4 getProjectionTransformation();
 	void setProjectionTransformation(const glm::mat4x4 mat);
 
@@ -49,10 +50,6 @@ public:
 		const float far);
 
 	void SetZoom(const float zoom);
-
-	
-
-
 
 	// Add more methods/functionality as needed...
 };

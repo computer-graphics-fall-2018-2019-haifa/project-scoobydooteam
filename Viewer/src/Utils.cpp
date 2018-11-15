@@ -104,3 +104,89 @@ std::string Utils::GetFileName(const std::string& filePath)
 
 	return filePath.substr(index + 1, len - index);
 }
+
+glm::mat4x4  Utils::Scaling(glm::vec3 vec) {
+
+	glm::mat4x4 trans = glm::mat4(1.0);
+
+	if(vec.x != 0) trans[0][0] = vec.x;
+	if (vec.y != 0) trans[1][1] = vec.y;
+	if (vec.z != 0) trans[2][2] = vec.z;
+	return trans;
+}
+
+glm::mat4x4   Utils::Rotation(glm::vec3 vec) {
+
+	if (vec.x != 0)
+	{
+		if (vec.x > 0) {
+			glm::vec4 m0(1, 0, 0, 0);
+			glm::vec4 m1(0, cos(vec.x), -sin(vec.x), 0);
+			glm::vec4 m2(0, sin(vec.x), cos(vec.x), 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+		else {
+			glm::vec4 m0(1, 0, 0, 0);
+			glm::vec4 m1(0, cos(vec.x), sin(vec.x), 0);
+			glm::vec4 m2(0, -sin(vec.x), cos(vec.x), 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+	}
+	else if (vec.y != 0) {
+		if (vec.y > 0) {
+			glm::vec4 m0(cos(vec.y), 0, sin(vec.y), 0);
+			glm::vec4 m1(0, 1, 0, 0);
+			glm::vec4 m2(-sin(vec.y), 0, cos(vec.y), 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+		else {
+			glm::vec4 m0(cos(vec.y), 0, -sin(vec.y), 0);
+			glm::vec4 m1(0, 1, 0, 0);
+			glm::vec4 m2(sin(vec.y), 0, cos(vec.y), 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+	}
+	else if (vec.z != 0)
+	{
+		if (vec.z > 0) {
+			glm::vec4 m0(cos(vec.z), -sin(vec.z), 0, 0);
+			glm::vec4 m1(sin(vec.z), cos(vec.z), 0, 0);
+			glm::vec4 m2(0, 0, 1, 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+		else {
+			glm::vec4 m0(cos(vec.z), sin(vec.z), 0, 0);
+			glm::vec4 m1(-sin(vec.z), cos(vec.z), 0, 0);
+			glm::vec4 m2(0, 0, 1, 0);
+			glm::vec4 m3(0, 0, 0, 1);
+			glm::mat4x4 mat(m0, m1, m2, m3);
+			return mat;
+		}
+	}
+	glm::vec4 m0(1, 0, 0, 0);
+	glm::vec4 m1(0, 1, 0, 0);
+	glm::vec4 m2(0,0, 1, 0);
+	glm::vec4 m3(0, 0, 0, 1);
+	glm::mat4x4 mat(m0, m1, m2, m3);
+	return mat;
+}
+
+/*TODO: the mat mul does not work correctly!*/
+glm::mat4x4  Utils::Translation(glm::vec3 t) {
+	glm::mat4x4 trans = glm::mat4(1.0);
+
+	trans[3][0] = t.x;
+	trans[3][1] = t.y;
+	trans[3][2] = t.z;
+	return trans;
+}

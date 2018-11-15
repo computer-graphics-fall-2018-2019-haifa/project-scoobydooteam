@@ -12,6 +12,10 @@ class Utils
 public:
 	static glm::vec3 Vec3fFromStream(std::istream& issLine);
 	static glm::vec2 Vec2fFromStream(std::istream& issLine);
+	
+	static glm::mat4x4  Scaling(glm::vec3 vec);
+	static glm::mat4x4  Rotation(glm::vec3 vec);
+	static glm::mat4x4  Translation(glm::vec3 vec);
 	static MeshModel LoadMeshModel(const std::string& filePath);
 
 	// Add here more static utility functions...

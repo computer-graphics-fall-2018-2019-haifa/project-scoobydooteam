@@ -35,6 +35,15 @@ int main(int argc, char **argv)
 	// Create GLFW window
 	int windowWidth = 1280, windowHeight = 720;
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
+	MeshModel grid;
+	std::vector<glm::vec3> grid_point;
+	for (std::vector<glm::vec3>::iterator it = grid_point.begin(); it != grid_point.end(); it++)
+		for (int i = 0; i < 1280; i += 80)
+			for (int j = 0; j < 720; j += 80)
+				grid_point.push_back(glm::vec3(j, i, 0));
+
+
+
 	if (!window)
 	{
 		return 1;

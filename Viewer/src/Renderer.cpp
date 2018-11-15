@@ -1,4 +1,4 @@
-#define _USE_MATH_DEFINES
+ #define _USE_MATH_DEFINES
 
 #include "Renderer.h"
 #include "InitShader.h"
@@ -6,6 +6,7 @@
 #include <imgui/imgui.h>
 #include <vector>
 #include <cmath>
+#include "Utils.h"
 
 #define INDEX(width,x,y,c) ((x)+(y)*(width))*3+(c)
 
@@ -74,49 +75,56 @@ void Renderer::SetViewport(int viewportWidth, int viewportHeight, int viewportX,
 
 void Renderer::Render(const Scene& scene)
 {
-	const int c = scene.GetModelCount();
+	line(0, 360, 1280, 360, glm::vec3(255, 255, 0));
+	line(640, 0, 640, 720, glm::vec3(255, 255, 0));
 	glm::vec2 x0(640, 360);
+	
 	std::vector<std::shared_ptr<MeshModel>> models = scene.getModels();
 	std::vector<Camera> cameras = scene.GetCameras();
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<Face> faces;
-	/*for (int i=640;i<660;i++)
-		for(int j=360;j<380;j++)
-			putPixel(i, j, glm::vec3(255, 0, 0));*/
 			
 	for (std::vector<std::shared_ptr<MeshModel>>::iterator itr = models.begin(); itr != models.end(); itr++)
 	{
-		glm::vec3 normalL(10.0,10.0,10.0);
-		int i = 0;
 		vertices = (*itr)->getVertices();
+		std::vector<glm::vec3> newV;
+
+		//(*itr)->SetWorldTransformation(Utils::Rotation(glm::vec3(0.01, 0, 0)));
+		//(*itr)->SetWorldTransformation(Utils::Translation(glm::vec3(2, 20, 0)));
+		glm::mat4x4 t = (*itr)->GetWorldTransformation();
+		for(std::vector<glm::vec3>::iterator it = vertices.begin(); it != vertices.end(); it++)
+			newV.push_back( t * glm::vec4(*it,1));
+
+		//(*itr)->setVertices(vertices);
 		faces = (*itr)->getFaces();
 		normals = (*itr)->getNormals();
 		for (std::vector<Face>::iterator it = faces.begin(); it != faces.end(); it++)
 		{
-			i++;
-			glm::vec3  p1,p2,p3;
-			glm::vec3  n1, n2, n3;
-			p1 = vertices.at(it->GetVertexIndex(0)-1);
-			p2 = vertices.at(it->GetVertexIndex(1)-1);
-			p3 = vertices.at(it->GetVertexIndex(2)-1);
+			glm::vec4  p1,p2,p3;
+			//glm::vec3  n1, n2, n3;
+			p1 = glm::vec4(newV.at(it->GetVertexIndex(0)-1),1);
+			p2 = glm::vec4(newV.at(it->GetVertexIndex(1)-1),1);
+			p3 = glm::vec4(newV.at(it->GetVertexIndex(2)-1),1);
+
 			
-			float length = 10;
+			/*float length = 10;
 			n1 = length * normals.at(it->GetNormalIndex(0) - 1);
-			n2 = normalL * normals.at(it->GetNormalIndex(1) - 1);
-			n3 = normalL * normals.at(it->GetNormalIndex(2) - 1);
+			n2 = length * normals.at(it->GetNormalIndex(1) - 1);
+			n3 = length * normals.at(it->GetNormalIndex(2) - 1);*/
 
-			double a = p1.x;
-			line(x0.x+p1.x, x0.y + p1.y, x0.x + p2.x, x0.y + p2.y, glm::vec3(255, 255, 0));
-			line(x0.x + p1.x, x0.y + p1.y, x0.x + p3.x , x0.y + p3.y , glm::vec3(255, 255, 0));
-			line(x0.x + p2.x , x0.y + p2.y, x0.x + p3.x, x0.y + p3.y , glm::vec3(255, 255, 0));
+			line(x0.x +p1.x , x0.y + p1.y , x0.x + p2.x , x0.y + p2.y , glm::vec3(0, 0, 0));
+			line(x0.x + p1.x , x0.y + p1.y , x0.x + p3.x , x0.y + p3.y , glm::vec3(0, 0, 0));
+			line(x0.x + p2.x , x0.y + p2.y , x0.x + p3.x , x0.y + p3.y , glm::vec3(0, 0, 0));
 
-			line(p1.x, p1.y, p1.x + n1.x, p1.y + n1.y, glm::vec3(0, 255, 0));
-			line(x0.x + p2.x, x0.y + p2.y, x0.x + n2.x, x0.y + n2.y, glm::vec3(0, 255, 0));
-			line(x0.x + p3.x, x0.y + p3.y, x0.x + n3.x, x0.y + n3.y, glm::vec3(0, 255, 0));
+			//line(x0.x + p1.x / p1.z, x0.y + p1.y / p1.z, x0.x + p2.x / p2.z, x0.y + p2.y / p2.z, glm::vec3(0, 0, 0));
+			//line(x0.x + p1.x / p1.z, x0.y + p1.y / p1.z, x0.x + p3.x / p3.z, x0.y + p3.y / p3.z, glm::vec3(0, 0, 0));
+			//line(x0.x + p2.x / p2.z, x0.y + p2.y / p2.z, x0.x + p3.x / p3.z, x0.y + p3.y / p3.z, glm::vec3(0, 0, 0));
 
-			//for (int i = 0; i < 400; i++)
-				//line(500, 500, 500 + 200 * cos(i / 100.0*3.14 / 2), 500 + 200 * sin(i / 100.0*3.14 / 2),1);
+			//line(p1.x, p1.y, p1.x + n1.x, p1.y + n1.y, glm::vec3(0, 255, 0));
+			//line(x0.x + p2.x, x0.y + p2.y, x0.x + n2.x, x0.y + n2.y, glm::vec3(0, 255, 0));
+			//line(x0.x + p3.x, x0.y + p3.y, x0.x + n3.x, x0.y + n3.y, glm::vec3(0, 255, 0));
+
 		}
 	}
 
